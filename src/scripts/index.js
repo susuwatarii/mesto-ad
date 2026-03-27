@@ -48,6 +48,7 @@ const usersStatsModalWindow = document.querySelector(".popup_type_info");
 const usersStatsModalTitle = usersStatsModalWindow.querySelector(".popup__title");
 const usersStatsModalInfoList = usersStatsModalWindow.querySelector(".popup__info");
 const usersStatsModalUsersList = usersStatsModalWindow.querySelector(".popup__list");
+const usersStatsModalText = usersStatsModalWindow.querySelector(".popup__text");
 
 const infoStringTemplate = document.querySelector("#popup-info-definition-template").content;
 const userPreviewTemplate = document.querySelector("#popup-info-user-preview-template").content;
@@ -194,32 +195,39 @@ const handleLogoClick = () => {
   getCardList()
     .then((cards) => {
       usersStatsModalTitle.textContent = "Статистика пользователей";
+      usersStatsModalText.textContent = "Все пользователи:";
       usersStatsModalInfoList.innerHTML = "";
       usersStatsModalUsersList.innerHTML = "";
 
       const uniqueUsers = [...new Set(cards.map((card) => card.owner.name))];
 
+      const userCardsMap = {};
+      cards.forEach((card) => {
+        const userName = card.owner.name;
+        userCardsMap[userName] = (userCardsMap[userName] || 0) + 1;
+      });
+
+      const maxCardsFromOneUser = Math.max(...Object.values(userCardsMap));
+
       usersStatsModalInfoList.append(
         createInfoString("Всего карточек:", cards.length)
       );
+
+      usersStatsModalInfoList.append(
+        createInfoString("Первая создана:", formatDate(new Date(cards[cards.length - 1].createdAt)))
+      );
+
+      usersStatsModalInfoList.append(
+        createInfoString("Последняя создана:", formatDate(new Date(cards[0].createdAt)))
+      );
+
       usersStatsModalInfoList.append(
         createInfoString("Всего пользователей:", uniqueUsers.length)
       );
 
-      if (cards.length > 0) {
-        usersStatsModalInfoList.append(
-          createInfoString(
-            "Первая создана:",
-            formatDate(new Date(cards[cards.length - 1].createdAt))
-          )
-        );
-        usersStatsModalInfoList.append(
-          createInfoString(
-            "Последняя создана:",
-            formatDate(new Date(cards[0].createdAt))
-          )
-        );
-      }
+      usersStatsModalInfoList.append(
+        createInfoString("Максимум карточек от одного:", maxCardsFromOneUser)
+      );
 
       uniqueUsers.forEach((userName) => {
         usersStatsModalUsersList.append(createUserPreview(userName));
