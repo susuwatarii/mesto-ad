@@ -53,6 +53,13 @@ const usersStatsModalText = usersStatsModalWindow.querySelector(".popup__text");
 const infoStringTemplate = document.querySelector("#popup-info-definition-template").content;
 const userPreviewTemplate = document.querySelector("#popup-info-user-preview-template").content;
 
+
+const confirmDeleteModalWindow = document.querySelector(".popup_type_confirm");
+const confirmDeleteForm = confirmDeleteModalWindow.querySelector(".popup__form");
+
+let cardToDelete = null;
+let cardIdToDelete = null;
+
 let currentUserId = "";
 
 const formatDate = (date) =>
@@ -90,14 +97,21 @@ const handlePreviewPicture = ({ name, link }) => {
   openModalWindow(imageModalWindow);
 };
 
+// const handleDeleteCard = (cardId, cardElement) => {
+//   deleteCardRequest(cardId)
+//     .then(() => {
+//       cardElement.remove();
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// };
+
 const handleDeleteCard = (cardId, cardElement) => {
-  deleteCardRequest(cardId)
-    .then(() => {
-      cardElement.remove();
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  cardToDelete = cardElement;
+  cardIdToDelete = cardId;
+
+  openModalWindow(confirmDeleteModalWindow);
 };
 
 const handleLikeCard = (cardId, isLiked, likeButton, likeCountElement) => {
@@ -245,6 +259,29 @@ profileForm.addEventListener("submit", handleProfileFormSubmit);
 cardForm.addEventListener("submit", handleCardFormSubmit);
 avatarForm.addEventListener("submit", handleAvatarFormSubmit);
 logoElement.addEventListener("click", handleLogoClick);
+
+confirmDeleteForm.addEventListener("submit", (evt) => {
+  evt.preventDefault();
+
+  const submitButton = evt.submitter;
+  const defaultText = submitButton.textContent;
+  submitButton.textContent = "Удаление...";
+
+  deleteCardRequest(cardIdToDelete)
+    .then(() => {
+      cardToDelete.remove();
+      closeModalWindow(confirmDeleteModalWindow);
+
+      cardToDelete = null;
+      cardIdToDelete = null;
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+    .finally(() => {
+      submitButton.textContent = defaultText;
+    });
+});
 
 openProfileFormButton.addEventListener("click", () => {
   profileTitleInput.value = profileTitle.textContent;
