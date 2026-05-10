@@ -3,7 +3,7 @@ name: Deploy Vite site to GitHub Pages
 on:
   push:
     branches:
-      - feat/user-stats-modal
+      - main
   workflow_dispatch:
 
 permissions:
