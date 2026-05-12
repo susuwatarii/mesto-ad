@@ -1,4 +1,12 @@
-import { createCardElement } from "./components/card.js";
+import {
+  enableValidation,
+  clearValidation,
+} from "./components/validation.js";
+import {
+  createCardElement,
+  updateLike,
+  deleteCardElement,
+} from "./components/card.js";
 import {
   openModalWindow,
   closeModalWindow,
@@ -62,6 +70,15 @@ let cardIdToDelete = null;
 
 let currentUserId = "";
 
+const validationConfig = {
+  formSelector: ".popup__form",
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inactiveButtonClass: "popup__button_disabled",
+  inputErrorClass: "popup__input_type_error",
+  errorClass: "popup__error_visible",
+};
+
 const formatDate = (date) =>
   date.toLocaleDateString("ru-RU", {
     year: "numeric",
@@ -117,10 +134,7 @@ const handleDeleteCard = (cardId, cardElement) => {
 const handleLikeCard = (cardId, isLiked, likeButton, likeCountElement) => {
   changeLikeCardStatus(cardId, isLiked)
     .then((updatedCard) => {
-      likeButton.classList.toggle("card__like-button_is-active");
-      if (likeCountElement) {
-        likeCountElement.textContent = updatedCard.likes.length;
-      }
+      updateLike(likeButton, likeCountElement, updatedCard.likes.length);
     })
     .catch((err) => {
       console.log(err);
@@ -269,7 +283,7 @@ confirmDeleteForm.addEventListener("submit", (evt) => {
 
   deleteCardRequest(cardIdToDelete)
     .then(() => {
-      cardToDelete.remove();
+      deleteCardElement(cardToDelete);
       closeModalWindow(confirmDeleteModalWindow);
 
       cardToDelete = null;
@@ -286,18 +300,23 @@ confirmDeleteForm.addEventListener("submit", (evt) => {
 openProfileFormButton.addEventListener("click", () => {
   profileTitleInput.value = profileTitle.textContent;
   profileDescriptionInput.value = profileDescription.textContent;
+  clearValidation(profileForm, validationConfig);
   openModalWindow(profileFormModalWindow);
 });
 
 profileAvatar.addEventListener("click", () => {
   avatarForm.reset();
+  clearValidation(avatarForm, validationConfig);
   openModalWindow(avatarFormModalWindow);
 });
 
 openCardFormButton.addEventListener("click", () => {
   cardForm.reset();
+  clearValidation(cardForm, validationConfig);
   openModalWindow(cardFormModalWindow);
 });
+
+console.log("Дошли до загрузки данных");
 
 Promise.all([getCardList(), getUserInfo()])
   .then(([cards, userData]) => {
@@ -326,3 +345,5 @@ const allPopups = document.querySelectorAll(".popup");
 allPopups.forEach((popup) => {
   setCloseModalWindowEventListeners(popup);
 });
+
+enableValidation(validationConfig);
