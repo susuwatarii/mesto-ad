@@ -114,16 +114,6 @@ const handlePreviewPicture = ({ name, link }) => {
   openModalWindow(imageModalWindow);
 };
 
-// const handleDeleteCard = (cardId, cardElement) => {
-//   deleteCardRequest(cardId)
-//     .then(() => {
-//       cardElement.remove();
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//     });
-// };
-
 const handleDeleteCard = (cardId, cardElement) => {
   cardToDelete = cardElement;
   cardIdToDelete = cardId;
@@ -315,8 +305,6 @@ openCardFormButton.addEventListener("click", () => {
   clearValidation(cardForm, validationConfig);
   openModalWindow(cardFormModalWindow);
 });
-
-console.log("Дошли до загрузки данных");
 
 Promise.all([getCardList(), getUserInfo()])
   .then(([cards, userData]) => {
